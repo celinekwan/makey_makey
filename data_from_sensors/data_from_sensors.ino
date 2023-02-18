@@ -16,11 +16,13 @@ void setup() {
   pinMode(photoresistorPin, INPUT);// Set pResistor - A0 pin as an input (optional)
   //pinMode(sensor1, INPUT);
   //pinMode(sensor2, INPUT);
+  pinMode(pingPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 //globals
-int data1, data2; //store data from both sensors
-double data3; // store lux value 
+int distance, brightness; //store data from both sensors
+double luxBrightness; // store lux value 
 int freq = 1000; //data collection frequency ~x milliseconds
 
 //global - store the header names in CSV file
@@ -44,13 +46,12 @@ void loop() {
 
   // distance sensor code
   long duration, inches, cm;
-  pinMode(pingPin, OUTPUT);
   digitalWrite(pingPin, LOW);
   delayMicroseconds(2);
   digitalWrite(pingPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(pingPin, LOW);
-  pinMode(echoPin, INPUT);
+
   duration = pulseIn(echoPin, HIGH);
   inches = microsecondsToInches(duration);
   cm = microsecondsToCentimeters(duration); // data
@@ -60,19 +61,19 @@ void loop() {
   double luminosity = luminosityLevel(analogValue);
 
   // data from sensors
-  data1 = cm;
-  data2 = analogValue;
-  data3 = luminosity;
+  distance = cm;
+  brightness = analogValue;
+  luxBrightness = luminosity;
 
-  //data1 = analogRead(sensor1);
-  //data2 = analogRead(sensor2);
+  //distance = analogRead(sensor1);
+  //brightness = analogRead(sensor2);
 
   //Display Data to Serial Monitor
-  Serial.print(data1);
+  Serial.print(distance);
   Serial.print(",");
-  Serial.print(data2);
+  Serial.print(brightness);
   Serial.print(",");
-  Serial.println(data3);
+  Serial.println(luxBrightness);
 
   delay(freq);
 
