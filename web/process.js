@@ -4,6 +4,8 @@ async function requestSerialPort() {
     let port;
     port = await navigator.serial.requestPort();
 
+    document.getElementById("message").innerHTML = "Perfect reading conditions!";
+
     await port.open({ baudRate: 9600 });
     
     // Create a reader to read data from the serial port
@@ -26,8 +28,6 @@ async function requestSerialPort() {
             document.getElementById("message").innerHTML = "Warning: Light levels are too bright for reading!";
         } else if (state.localeCompare("d") == 0) {
             document.getElementById("message").innerHTML = "Warning: Light levels are too dim for reading!";
-        } else if (state.localeCompare("f") == 0) {
-            document.getElementById("message").innerHTML = "Warning: Book is too far for reading!";
         } else if (state.localeCompare("c") == 0) {
             document.getElementById("message").innerHTML = "Warning: Book is too close for reading!";
         } else if (state.localeCompare("n") == 0) {
@@ -39,7 +39,6 @@ async function requestSerialPort() {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("startButton").addEventListener('click', () => {
         document.getElementById("startButton").remove();
-        document.getElementById("message").innerHTML = "Perfect reading conditions!";
         requestSerialPort();
     });
 });
