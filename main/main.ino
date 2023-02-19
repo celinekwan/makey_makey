@@ -9,6 +9,7 @@ const double RESISTOR = 10000;
 const int VIN = 5;
 
 const int AVG_COUNT = 100;
+unsigned long timeLastBrightnessBuzz;
 
 void setup() {
   // put your setup code here, to run once:
@@ -17,6 +18,8 @@ void setup() {
   pinMode(pingPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(buzzPin, OUTPUT);
+  digitalWrite(buzzPin, LOW);
+  timeLastBrightnessBuzz = millis();
 
   //print out column headers
   Serial.print("Distance_sensor(cm)");
@@ -60,7 +63,7 @@ void loop() {
 
   // Check values and buzz
   updateBrightnessAvg();
-  // buzzBrightness();
+  buzzBrightness();
   // buzzDistance();
 
   //Display Data to Serial Monitor
@@ -119,11 +122,20 @@ void updateBrightnessAvg() {
   luxBrightnessAvg = sum / luxBrightnessCount;
 }
 
-// void buzzBrightness() {
-//   if (avgBrightness > 1000) { // Too bright for too long, buzz
-    
-//   }
-// }
+void buzz() {
+  digitalWrite(buzzPin, HIGH);
+  delay(10);
+  digitalWrite(buzzPin, LOW);
+}
+
+void buzzBrightness() {
+  if (luxBrightnessAvg > 400 && (timeLastBrightnessBuzz - millis() > 10000)) { // Too bright for too long, buzz
+    buzz();
+    delay(100);
+    buzz();
+  }
+  timeLastBrightnessBuzz = millis();
+}
 
 // void buzzDistance() {
 
