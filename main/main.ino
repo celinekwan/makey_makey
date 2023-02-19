@@ -64,7 +64,7 @@ void loop() {
   // Check values and buzz
   updateBrightnessAvg();
   buzzBrightness();
-  // buzzDistance();
+  buzzDistance();
 
   //Display Data to Serial Monitor
   Serial.print("Distance: ");
@@ -137,6 +137,12 @@ void buzzBrightness() {
   timeLastBrightnessBuzz = millis();
 }
 
-// void buzzDistance() {
-
-// }
+void buzzDistance() {
+  if (distance < 40) {
+    buzz();
+    delay(50);
+    buzz();
+    delay(50);
+    buzz();
+  }
+}
