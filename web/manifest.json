@@ -1,0 +1,12 @@
+{
+    "name": "Reading Aide",
+    "version": "1.0.0",
+    "description": "Warnings about improper reading conditions",
+    "manifest_version": 3,
+    "author": "Alexander Lay",
+    "icons": {"16": "icon.png"},
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "Reading Aide"
+    }
+}
