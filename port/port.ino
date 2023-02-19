@@ -8,11 +8,10 @@ const int pingPin = 7; // Trigger Pin of Ultrasonic Sensor
 const int echoPin = 6; // Echo Pin of Ultrasonic Sensor
 
 double brightStart;
-boolean brightTrack;
+boolean brightTrack = false;
 double dimStart;
-boolean dimTrack;
-boolean closeTrack;
-boolean buzzed = false;
+boolean dimTrack = false;
+boolean closeTrack = false;
 
 void setup() {
   Serial.begin(9600);
@@ -38,52 +37,46 @@ void loop() {
   duration = pulseIn(echoPin, HIGH);
   cm = microsecondsToCentimeters(duration);
 
+  // Too close
+  if (cm < 30) {
+    if (!closeTrack) {
+      closeTrack = !closeTrack;
+    }
+    Serial.println("c");
+    buzz();
+  
   // Too bright for too long
-  if (luminosity > 1000) {
+  } else if (luminosity > 1000) {
     if (!brightTrack) {
       brightTrack = !brightTrack;
       brightStart = millis();
     } else if ( millis() - brightStart > 5000) {
-      if (!buzzed) {
-        buzzed = !buzzed;
-        buzz();
-       }
        Serial.println("b");
+       buzz();
     } else {
       Serial.println("n");
+      closeTrack = false;
     }
 
   // Too dim for too long
-  } else if (luminosity < 250) {
+  } else if (luminosity < 100) {
     if (!dimTrack) {
       dimTrack = !dimTrack;
       dimStart = millis();
     } else if (millis() - dimStart > 5000) {
-       if (!buzzed) {
-        buzzed = !buzzed;
-        buzz();
-       }
        Serial.println("d");
+       buzz();
     } else {
       Serial.println("n");
+      closeTrack = false;
     }
-
-  // Too close
-  } else if (cm < 20) {
-    if (!closeTrack) {
-      closeTrack = !closeTrack;
-      if (!buzzed) {
-        buzzed = !buzzed;
-        buzz();
-      }
-    }
-    Serial.println("c");
     
   } else {
     Serial.println("n");
+    brightTrack = false;
+    dimTrack = false;
+    closeTrack = false;
   }
-  
-  delay(250);
 }
 
 double luminosityLevel(int analogValue) {
@@ -102,6 +95,7 @@ long microsecondsToCentimeters(long microseconds) {
 
 void buzz() {
   digitalWrite(buzzPin, HIGH);
-  delay(10);
+  delay(50);
   digitalWrite(buzzPin, LOW);
+  delay(100);
 }

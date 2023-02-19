@@ -14,14 +14,10 @@ async function requestSerialPort() {
     // Read data from the serial port
     while (true) {
       const { value, done } = await reader.read();
-      if (done) {
-        console.log("Serial port closed.");
-        break;
-      }
+      
       // Convert the received data to a string
       const textDecoder = new TextDecoder();
       let state = textDecoder.decode(value);
-      console.log(state);
 
       // Update Warning Message
         if (state.localeCompare("b") == 0) {
