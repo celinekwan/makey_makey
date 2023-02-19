@@ -1,11 +1,14 @@
 const int pingPin = 7; // Trigger Pin of Ultrasonic Sensor
 const int echoPin = 6; // Echo Pin of Ultrasonic Sensor
 const int photoresistorPin = A0; // Photoresistor Pin 
+const int buzzPin = 5;
 
 // globals for lux conversion
 const double ANALOG_OUTPUT_CONVERSION = 0.0048828125;
 const double RESISTOR = 10000;
 const int VIN = 5;
+
+const int AVG_COUNT = 100;
 
 void setup() {
   // put your setup code here, to run once:
@@ -13,6 +16,7 @@ void setup() {
   pinMode(photoresistorPin, INPUT);// Set pResistor - A0 pin as an input (optional)
   pinMode(pingPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(buzzPin, OUTPUT);
 
   //print out column headers
   Serial.print("Distance_sensor(cm)");
@@ -26,6 +30,11 @@ void setup() {
 int distance, brightness; //store data from both sensors
 double luxBrightness; // store lux value 
 int freq = 1000; //data collection frequency ~x milliseconds
+
+double luxBrightnessArr[AVG_COUNT] = {0};
+int luxBrightnessIdx = 0;
+int luxBrightnessCount = 0;
+double luxBrightnessAvg;
 
 void loop() {
   // distance sensor code
@@ -50,15 +59,24 @@ void loop() {
   luxBrightness = luminosity;
 
   // Check values and buzz
-  buzzBrightness();
-  buzzDistance();
+  updateBrightnessAvg();
+  // buzzBrightness();
+  // buzzDistance();
 
   //Display Data to Serial Monitor
+  Serial.print("Distance: ");
   Serial.print(distance);
-  Serial.print(",");
+  Serial.print(", Brightness: ");
   Serial.print(brightness);
-  Serial.print(",");
-  Serial.println(luxBrightness);
+  Serial.print(", lux Brightness: ");
+  Serial.print(luxBrightness);
+  Serial.println("");
+  Serial.print("luxBrightnessCount: ");
+  Serial.print(luxBrightnessCount);
+  Serial.print(", luxBrightnessIdx: ");
+  Serial.print(luxBrightnessIdx);
+  Serial.print(", lux Average: ");
+  Serial.println(luxBrightnessAvg);
 
   delay(freq);
 }
@@ -82,10 +100,31 @@ double luminosityLevel(int analogValue) {
   return luminosity;
 }
 
-void buzzBrightness() {
+void updateBrightnessAvg() {
+  if (luxBrightnessCount < AVG_COUNT) {
+    luxBrightnessCount++;
+  }
 
+  if (luxBrightnessIdx == AVG_COUNT) {
+    luxBrightnessIdx = 0;
+  } else {
+    luxBrightnessIdx++;
+  }
+
+  luxBrightnessArr[luxBrightnessIdx] = luxBrightness;
+  double sum = 0;
+  for (int i = 0; i < luxBrightnessCount; i++ ) {
+    sum += luxBrightnessArr[i];
+  }
+  luxBrightnessAvg = sum / luxBrightnessCount;
 }
 
-void buzzDistance() {
+// void buzzBrightness() {
+//   if (avgBrightness > 1000) { // Too bright for too long, buzz
+    
+//   }
+// }
 
-}
+// void buzzDistance() {
+
+// }
